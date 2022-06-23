@@ -1,0 +1,316 @@
+<!DOCTYPE HTML>
+<!--
+	Massively by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>Covid App</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Header -->
+					<header id="header">
+						<a href="index.html" class="logo">Home</a>
+					</header>
+
+				<!-- Nav -->
+					<nav id="nav">
+						<ul class="links">
+							<li class="active"><a href="index.html">Projects</a></li>
+							<li><a href="about_me.html">About Me</a></li>
+						</ul>
+						<ul class="icons">
+							<li><a href="https://www.linkedin.com/in/franciscopalab/" target ="_blank" class="icon brands fa-linkedin"><span class="label">LinkedIn</span></a></li>
+							<li><a href="https://github.com/FranciscoPala" target ="_blank" class="icon brands fa-github"><span class="label">GitHub</span></a></li>
+						</ul>
+					</nav>
+
+				<!-- Main -->
+					<div id="main">
+
+						<!-- Post -->
+							<section class="post">
+								<header class="major">
+									<h1>COVID-19 APP</h1>
+									<p>How to develop a covid-19 dashboard in Python with Streamlit and how to deploy it to AWS with Docker</p>
+								</header>
+								<div class="image main"><img src="images/covid_app_technologies.jpg" alt="" /></div>
+								<h2>Overview</h2>
+									<p>The motivation behind this project was to make informed quant-based decisions about the state of the pandemic. It started as a jupyter notebook with a couple of visualizations. Eventually, I decided it'd be interesting to share them with my family and friends, but going from a .ipynb to a web app is not trivial.<p>
+									<p>I learned about Streamlit from my teacher at a Data Science Bootcamp and decided to write those visualizations into an app and deploy them to the cloud using Docker and AWS. This project is the result of that journey. </p>
+									<p><a href="http://ec2-34-244-246-110.eu-west-1.compute.amazonaws.com:8501/" target ="_blank" class="button">Link to the app</a>
+										<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard" target ="_blank" class="button">Link to the Git Repo</a></p>
+									<p></p>
+								<h2>Datasets</h2>
+								<h3>Dataset with daily data</h3>
+									<p>The first thing we need is a dataset with our daily variables. Luckily for us, the Spanish Ministry of Health publishes this data sort of regularly <a href="https://cnecovid.isciii.es/covid19/resources/casos_hosp_uci_def_sexo_edad_provres.csv" target ="_blank">here</a>. We've written a function <a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/f92099e69dd12ec33e1e1168142a9f55703f3c50/utils/app_funcs.py#L10" target ="_blank"><b>get_data()</b></a> that reads the .csv file and does some basic formatting. The resulting table has 1.423.049 rows and 8 columns: province, sex, age, date, cases, hospitalizations, icu and deaths. The following table shows the observation with the highest hospitalizations value for each age group:</p>
+									<pre>
+										<table border="1" class="dataframe">
+											<thead>
+											  <tr style="text-align: right;">
+												<th>province</th>
+												<th>sex</th>
+												<th>age</th>
+												<th>date</th>
+												<th>cases</th>
+												<th>hospitalizations</th>
+												<th>icu</th>
+												<th>deaths</th>
+											  </tr>
+											</thead>
+											<tbody>
+											  <tr>
+												<td>M</td>
+												<td>H</td>
+												<td>0s</td>
+												<td>2022-01-10</td>
+												<td>816</td>
+												<td>16</td>
+												<td>0</td>
+												<td>0</td>
+											  </tr>
+											  <tr>
+												<td>V</td>
+												<td>M</td>
+												<td>10s</td>
+												<td>2021-12-30</td>
+												<td>686</td>
+												<td>12</td>
+												<td>0</td>
+												<td>0</td>
+											  </tr>
+											  <tr>
+												<td>M</td>
+												<td>M</td>
+												<td>20s</td>
+												<td>2020-03-21</td>
+												<td>54</td>
+												<td>24</td>
+												<td>0</td>
+												<td>0</td>
+											  </tr>
+											  <tr>
+												<td>M</td>
+												<td>H</td>
+												<td>30s</td>
+												<td>2020-03-20</td>
+												<td>108</td>
+												<td>69</td>
+												<td>3</td>
+												<td>0</td>
+											  </tr>
+											  <tr>
+												<td>M</td>
+												<td>H</td>
+												<td>40s</td>
+												<td>2020-03-25</td>
+												<td>270</td>
+												<td>146</td>
+												<td>13</td>
+												<td>1</td>
+											  </tr>
+											  <tr>
+												<td>M</td>
+												<td>H</td>
+												<td>50s</td>
+												<td>2020-03-23</td>
+												<td>292</td>
+												<td>248</td>
+												<td>20</td>
+												<td>4</td>
+											  </tr>
+											  <tr>
+												<td>M</td>
+												<td>H</td>
+												<td>60s</td>
+												<td>2020-03-25</td>
+												<td>305</td>
+												<td>251</td>
+												<td>30</td>
+												<td>17</td>
+											  </tr>
+											  <tr>
+												<td>M</td>
+												<td>H</td>
+												<td>70s</td>
+												<td>2020-03-23</td>
+												<td>277</td>
+												<td>270</td>
+												<td>25</td>
+												<td>74</td>
+											  </tr>
+											  <tr>
+												<td>M</td>
+												<td>H</td>
+												<td>80+</td>
+												<td>2020-03-18</td>
+												<td>174</td>
+												<td>186</td>
+												<td>2</td>
+												<td>48</td>
+											  </tr>
+											  <tr>
+												<td>NC</td>
+												<td>NC</td>
+												<td>NC</td>
+												<td>2020-03-31</td>
+												<td>137</td>
+												<td>62</td>
+												<td>7</td>
+												<td>3</td>
+											  </tr>
+											</tbody>
+										  </table>
+									</pre>
+								<h3>Dataset with population data</h3>
+									<p>Because we're interested in normalizing the data to the total population of each age group, we've built a dataset locally from multiple sources from the Spanish Instituto Nacional de Estadística. Subset of that table for the province of Madrid:</p>
+									<pre>
+										<table border="1" class="dataframe">
+											<thead>
+											  <tr style="text-align: right;">
+												<th>provinciaINE</th>
+												<th>codigoProvincia</th>
+												<th>nombreProvincia</th>
+												<th>codigoCCAA</th>
+												<th>nombreCCAA</th>
+												<th>age</th>
+												<th>population</th>
+											  </tr>
+											</thead>
+											<tbody>
+											  <tr>
+												<td>28</td>
+												<td>M</td>
+												<td>Madrid</td>
+												<td>MD</td>
+												<td>Madrid, Comunidad de</td>
+												<td>0s</td>
+												<td>629528</td>
+											  </tr>
+											  <tr>
+												<td>28</td>
+												<td>M</td>
+												<td>Madrid</td>
+												<td>MD</td>
+												<td>Madrid, Comunidad de</td>
+												<td>10s</td>
+												<td>707402</td>
+											  </tr>
+											  <tr>
+												<td>28</td>
+												<td>M</td>
+												<td>Madrid</td>
+												<td>MD</td>
+												<td>Madrid, Comunidad de</td>
+												<td>20s</td>
+												<td>740590</td>
+											  </tr>
+											  <tr>
+												<td>28</td>
+												<td>M</td>
+												<td>Madrid</td>
+												<td>MD</td>
+												<td>Madrid, Comunidad de</td>
+												<td>30s</td>
+												<td>920147</td>
+											  </tr>
+											  <tr>
+												<td>28</td>
+												<td>M</td>
+												<td>Madrid</td>
+												<td>MD</td>
+												<td>Madrid, Comunidad de</td>
+												<td>40s</td>
+												<td>1159083</td>
+											  </tr>
+											  <tr>
+												<td>28</td>
+												<td>M</td>
+												<td>Madrid</td>
+												<td>MD</td>
+												<td>Madrid, Comunidad de</td>
+												<td>50s</td>
+												<td>986463</td>
+											  </tr>
+											  <tr>
+												<td>28</td>
+												<td>M</td>
+												<td>Madrid</td>
+												<td>MD</td>
+												<td>Madrid, Comunidad de</td>
+												<td>60s</td>
+												<td>717447</td>
+											  </tr>
+											  <tr>
+												<td>28</td>
+												<td>M</td>
+												<td>Madrid</td>
+												<td>MD</td>
+												<td>Madrid, Comunidad de</td>
+												<td>70s</td>
+												<td>524216</td>
+											  </tr>
+											  <tr>
+												<td>28</td>
+												<td>M</td>
+												<td>Madrid</td>
+												<td>MD</td>
+												<td>Madrid, Comunidad de</td>
+												<td>80+</td>
+												<td>366375</td>
+											  </tr>
+											  <tr>
+												<td>28</td>
+												<td>M</td>
+												<td>Madrid</td>
+												<td>MD</td>
+												<td>Madrid, Comunidad de</td>
+												<td>total</td>
+												<td>6751251</td>
+											  </tr>
+											</tbody>
+										  </table>
+										  
+									</pre>
+								<p>The covid dataset updates on-demand with a button in the Streamlit app, the population dataset won't receieve updates</p>
+								<h2>Transformations</h2>
+								<h4>Smoothing</h4>
+									<p>Visualizations related to differences in the data between provinces and sex have been left out for future development. In our case, we're interested in evolution of total daily values and differences between and within age groups. We've smoothed the observed variables to their 7-day simple moving average returned by the function <a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/f92099e69dd12ec33e1e1168142a9f55703f3c50/utils/app_funcs.py#L44" target="_blank"><b>get_sma_gby_date()</b></a> for aggregated daily values and <a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/f92099e69dd12ec33e1e1168142a9f55703f3c50/utils/app_funcs.py#L54" target = "_blank"><b>get_sma_gby_age_date()</b></a> for aggregated daily values by age group.</p> 
+									<div class="image main"><img src="images/covid_dash_daily_vs_sma.jpg" alt="" /></div>
+								<h4>Wave Variable</h4>	
+									<p>Because we're also interested in evaluating total values between waves, we've written the function <a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/f92099e69dd12ec33e1e1168142a9f55703f3c50/utils/app_funcs.py#L70" target="_blank"><b>get_waves()</b></a> which takes advantage of the scipy function <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.find_peaks.html">find_peaks()</a> to determine wave peaks, and then defines wave frontiers as the minimum between peaks.</p>
+									<div class="image main"><img src="images/covid_dash_waves_plot.jpg" alt="" /></div>
+								<h2>Generating Relevant Plots</h2>
+								<p></p>
+								</section>
+
+					</div>
+
+
+				<!-- Copyright -->
+				<div id="copyright">
+					<ul><li>&copy; Francisco Palá</li><li>Template by <a href="https://aj.lkn.io/">@ajlkn</a> for <a href="https://html5up.net/">html5up</a></li></ul>
+				</div>
+
+			</div>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+
+	</body>
+</html>
