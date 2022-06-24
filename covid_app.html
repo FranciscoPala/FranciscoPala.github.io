@@ -51,8 +51,11 @@
 										<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard" target ="_blank" class="button">Link to the Git Repo</a></p>
 									<p></p>
 								<h2>Datasets</h2>
+								<p>Both datasets are available in the "Overview" section of the app.</p>
 								<h3>Dataset with daily data</h3>
-									<p>The first thing we need is a dataset with our daily variables. Luckily for us, the Spanish Ministry of Health publishes this data sort of regularly <a href="https://cnecovid.isciii.es/covid19/resources/casos_hosp_uci_def_sexo_edad_provres.csv" target ="_blank">here</a>. We've written a function <a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/f92099e69dd12ec33e1e1168142a9f55703f3c50/utils/app_funcs.py#L10" target ="_blank"><b>get_data()</b></a> that reads the .csv file and does some basic formatting. The resulting table has 1.423.049 rows and 8 columns: province, sex, age, date, cases, hospitalizations, icu and deaths. The following table shows the observation with the highest hospitalizations value for each age group:</p>
+									<p>The first thing we need is a dataset with our daily variables. Luckily for us, the Spanish Ministry of Health publishes this data sort of regularly <a href="https://cnecovid.isciii.es/covid19/resources/casos_hosp_uci_def_sexo_edad_provres.csv" target ="_blank">here</a>. We've written a function 
+										<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/f92099e69dd12ec33e1e1168142a9f55703f3c50/utils/app_funcs.py#L10" target ="_blank"><code>get_data()</code></a> 
+									that reads the .csv file and does some basic formatting. The resulting table has 1.423.049 rows and 8 columns: province, sex, age, date, cases, hospitalizations, icu and deaths. The following table shows the observation with the highest hospitalizations value for each age group:</p>
 									<pre>
 										<table border="1" class="dataframe">
 											<thead>
@@ -284,13 +287,57 @@
 								<p>The covid dataset updates on-demand with a button in the Streamlit app, the population dataset won't receieve updates</p>
 								<h2>Transformations</h2>
 								<h4>Smoothing</h4>
-									<p>Visualizations related to differences in the data between provinces and sex have been left out for future development. In our case, we're interested in evolution of total daily values and differences between and within age groups. We've smoothed the observed variables to their 7-day simple moving average returned by the function <a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/f92099e69dd12ec33e1e1168142a9f55703f3c50/utils/app_funcs.py#L44" target="_blank"><b>get_sma_gby_date()</b></a> for aggregated daily values and <a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/f92099e69dd12ec33e1e1168142a9f55703f3c50/utils/app_funcs.py#L54" target = "_blank"><b>get_sma_gby_age_date()</b></a> for aggregated daily values by age group.</p> 
+									<p>Visualizations related to differences in the data between provinces and sex have been left out for future development. In our case, we're interested in evolution of total daily values and differences between and within age groups. We've smoothed the observed variables to their 7-day simple moving average returned by the function 
+										<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/f92099e69dd12ec33e1e1168142a9f55703f3c50/utils/app_funcs.py#L44" target="_blank"><code>get_sma_gby_date()</code></a> 
+									for aggregated daily values and 
+										<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/f92099e69dd12ec33e1e1168142a9f55703f3c50/utils/app_funcs.py#L54" target = "_blank"><code>get_sma_gby_age_date()</code></a> 
+									for aggregated daily values by age group.</p> 
 									<div class="image main"><img src="images/covid_dash_daily_vs_sma.jpg" alt="" /></div>
 								<h4>Wave Variable</h4>	
-									<p>Because we're also interested in evaluating total values between waves, we've written the function <a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/f92099e69dd12ec33e1e1168142a9f55703f3c50/utils/app_funcs.py#L70" target="_blank"><b>get_waves()</b></a> which takes advantage of the scipy function <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.find_peaks.html">find_peaks()</a> to determine wave peaks, and then defines wave frontiers as the minimum between peaks.</p>
+									<p>Because we're also interested in evaluating total values between waves, we've written the function 
+										<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/f92099e69dd12ec33e1e1168142a9f55703f3c50/utils/app_funcs.py#L70" target="_blank"><code>get_waves()</code></a> 
+										which takes advantage of the scipy function 
+										<a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.find_peaks.html">find_peaks()</a> 
+										to determine wave peaks, and then defines wave frontiers as the minimum between peaks.</p>
 									<div class="image main"><img src="images/covid_dash_waves_plot.jpg" alt="" /></div>
 								<h2>Generating Relevant Plots</h2>
-								<p></p>
+									<p>We desire the app to have four sections: cases, hospitalizations, ICU admissions, and deaths. And each section will have the following visualizations:</p>
+									<ol>
+										<li>An interactive line plot illustrating the evolution of daily 7-day SMA for all age groups where the user can select which age groups to display.</li>
+										<li>A wave totals figure consisting of a Barplot of the wave totals and a heatmap representing what % of those totals each age group represents.</li>
+										<li>An age totals figure consisting of a Barplot of the age totals and a heatmap representing what % of those totals each wave represents.</li>
+										<li>A normalized totals figures where de normalization variable changes depending on the observed variable: total population for the cases variable, total cases and population for the hospitalizations variable, total hospitalizations and population for the ICU admissions variable, and total ICU admissions and population for the deaths variable.</li>
+									</ol>
+								<h3>1. Ineteractive Lineplot</h3>
+									<p>We've used the Python library Plotly to generate an interactive graph. The data used is the ouput of the function 
+											<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/f92099e69dd12ec33e1e1168142a9f55703f3c50/utils/app_funcs.py#L54" target = "_blank"><code>get_sma_gby_age_date()</code></a> 
+										and the function to plot the figure is 
+											<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/f92099e69dd12ec33e1e1168142a9f55703f3c50/utils/app_funcs.py#L203" target = "_blank"><code>plot_lineplot()</code></a>. 
+										In the app, the user can click on the age groups in the legend to toogle them on and off.</p>
+									<div class="image main"><img src="images/covid_dash_plotly_fig.png" alt="" /></div>
+								<h3>2. Wave totals figure</h3>
+									<p>We've used the Python library Seaborn to create a figure consisting of two axes. The first is the above mentioned heatmap representing combinations of wave/age group normalized to the wave totals. The latter represents those wave totals for reference. The data for the heatmap is the ouput of the function 
+										<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/3eb9e7863707c11855e5eacbfcacf87290ddde02/utils/app_funcs.py#L103" target="_blank"><code>get_wave_heatmap_data()</code></a>
+									and the data for the barplot is the total value for each wave, which does not require a function because it can be obtained with one line of code 
+										<code>data.groupby('wave', as_index=False).sum()</code>
+									. The function that plots the figure is
+										<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/3eb9e7863707c11855e5eacbfcacf87290ddde02/utils/app_funcs.py#L191" target="_blank"><code>plot_wave_heatmap()</code></a>
+									The resulting figure is:
+										<div class="image main"><img src="images/covid_dash_waves_fig.jpg" alt="" /></div>
+								<h3>3. Age group totals figure</h3>
+									<p>This figure is similar to the above except instead of normalizing to wave totals, we've normalized to age group totals. The function to get the data is
+										<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/3eb9e7863707c11855e5eacbfcacf87290ddde02/utils/app_funcs.py#L120" target="_blank"><code>get_age_heatmap_data()</code></a>
+									age group totals are obtained with
+										<code>data.groupby('age', as_index=False).sum()</code>
+									. The function that plots the figure is
+										<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/3eb9e7863707c11855e5eacbfcacf87290ddde02/utils/app_funcs.py#L251" target="_blank"><code>plot_heatmap_age()</code></a>
+									The resulting figure is:
+										<div class="image main"><img src="images/covid_dash_age_fig.jpg" alt="" /></div>
+									</p>
+								<h3>4. Totals normalized figure</h3>
+									<p>
+									This figure varies depending on the section of the app we are at. In the cases section, the figure consists of a heatmap with the total cases normalized to the Spanish population for that age group and a barplot displaying the total population. In 
+									</p>
 								</section>
 
 					</div>
