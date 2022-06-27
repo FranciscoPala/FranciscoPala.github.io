@@ -304,11 +304,11 @@
 									<p>We desire the app to have four sections: cases, hospitalizations, ICU admissions, and deaths. And each section will have the following visualizations:</p>
 									<ol>
 										<li>An interactive line plot illustrating the evolution of daily 7-day SMA for all age groups where the user can select which age groups to display.</li>
-										<li>A wave totals figure consisting of a Barplot of the wave totals and a heatmap representing what % of those totals each age group represents.</li>
-										<li>An age totals figure consisting of a Barplot of the age totals and a heatmap representing what % of those totals each wave represents.</li>
-										<li>A normalized totals figures where de normalization variable changes depending on the observed variable: total population for the cases variable, total cases and population for the hospitalizations variable, total hospitalizations and population for the ICU admissions variable, and total ICU admissions and population for the deaths variable.</li>
+										<li>A wave totals figure consisting of a Bar plot of the wave totals and a heatmap representing what % of those totals each age group represents.</li>
+										<li>An age totals figure consisting of a Bar plot of the age totals and a heatmap representing what % of those totals each wave represents.</li>
+										<li>A totals normalized figure where de normalization variable changes depending on the observed variable: total population for the cases variable, total cases and population for the hospitalizations variable, total hospitalizations and population for the ICU admissions variable, and total ICU admissions and population for the deaths variable.</li>
 									</ol>
-								<h3>1. Ineteractive Lineplot</h3>
+								<h3>1. Interactive Line plot</h3>
 									<p>We've used the Python library Plotly to generate an interactive graph. The data used is the ouput of the function 
 											<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/f92099e69dd12ec33e1e1168142a9f55703f3c50/utils/app_funcs.py#L54" target = "_blank"><code>get_sma_gby_age_date()</code></a> 
 										and the function to plot the figure is 
@@ -318,28 +318,142 @@
 								<h3>2. Wave totals figure</h3>
 									<p>We've used the Python library Seaborn to create a figure consisting of two axes. The first is the above mentioned heatmap representing combinations of wave/age group normalized to the wave totals. The latter represents those wave totals for reference. The data for the heatmap is the ouput of the function 
 										<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/3eb9e7863707c11855e5eacbfcacf87290ddde02/utils/app_funcs.py#L103" target="_blank"><code>get_wave_heatmap_data()</code></a>
-									and the data for the barplot is the total value for each wave, which does not require a function because it can be obtained with one line of code 
-										<code>data.groupby('wave', as_index=False).sum()</code>
-									. The function that plots the figure is
+									and the data for the bar plot is the total value for each wave, which does not require a function because it can be obtained with one line of code 
+										<code>data.groupby('wave', as_index=False).sum()</code>. 
+									The function that plots the figure is
 										<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/3eb9e7863707c11855e5eacbfcacf87290ddde02/utils/app_funcs.py#L191" target="_blank"><code>plot_wave_heatmap()</code></a>
 									The resulting figure is:
 										<div class="image main"><img src="images/covid_dash_waves_fig.jpg" alt="" /></div>
 								<h3>3. Age group totals figure</h3>
-									<p>This figure is similar to the above except instead of normalizing to wave totals, we've normalized to age group totals. The function to get the data is
+									<p>This figure is similar to the above except instead of normalizing to wave totals, we've normalized to age group totals. The function to get the data is:
 										<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/3eb9e7863707c11855e5eacbfcacf87290ddde02/utils/app_funcs.py#L120" target="_blank"><code>get_age_heatmap_data()</code></a>
-									age group totals are obtained with
-										<code>data.groupby('age', as_index=False).sum()</code>
-									. The function that plots the figure is
+									age group totals are obtained with:
+										<code>data.groupby('age', as_index=False).sum()</code>. 
+									The function that plots the figure is:
 										<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/3eb9e7863707c11855e5eacbfcacf87290ddde02/utils/app_funcs.py#L251" target="_blank"><code>plot_heatmap_age()</code></a>
 									The resulting figure is:
 										<div class="image main"><img src="images/covid_dash_age_fig.jpg" alt="" /></div>
 									</p>
 								<h3>4. Totals normalized figure</h3>
+								<h4>Cases section</h4>
 									<p>
-									This figure varies depending on the section of the app we are at. In the cases section, the figure consists of a heatmap with the total cases normalized to the Spanish population for that age group and a barplot displaying the total population. In 
+									This figure varies depending on the section of the app we are at. In the cases section, the figure consists of a heatmap with the total cases normalized to the Spanish population for that age group, and a bar plot displaying the total population. The data for the heatmap is generated by the function:
+										<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/3eb9e7863707c11855e5eacbfcacf87290ddde02/utils/app_funcs.py#L172" target="_blank"><code>get_age_totalpop_norm_heatmap_data()</code></a>population totals are obtained with the line of code:
+										<code>pop.groupby('age').population.sum().drop('total').reset_index()</code>.
+									The function that plots the figure is:
+										<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/3eb9e7863707c11855e5eacbfcacf87290ddde02/utils/app_funcs.py#L298" target="_blank"><code>plot_heatmap_pop()</code></a>
+									The resulting figure is:
+										<div class="image main"><img src="images/covid_dash_ratio_cases_fig.jpg" alt="" /></div>
 									</p>
-								</section>
+								<h4>hospitalizations, ICU admissions and deaths section</h4>
+									<p>
+										As noted before, these sections differ from the cases section in that, aside from the heatmap of the observed variable totals normalized to the Spanish population, there is a heatmap representing the ratio of the observed variable and the previous most restrictive variable (cases for hospitalizations, hospitalizations for ICU admissions and ICU admissions for deaths). The data for each section is obtained with the functions:
+										<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/3eb9e7863707c11855e5eacbfcacf87290ddde02/utils/app_funcs.py#L136" target="_blank"><code>get_hosp_ratio_data()</code></a>
+										<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/3eb9e7863707c11855e5eacbfcacf87290ddde02/utils/app_funcs.py#L148" target="_blank"><code>get_icu_ratio_data()</code></a>
+										<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/3eb9e7863707c11855e5eacbfcacf87290ddde02/utils/app_funcs.py#L160" target="_blank"><code>get_deaths_ratio_data()</code></a>
+										And the figures plotted with:
+										<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/3eb9e7863707c11855e5eacbfcacf87290ddde02/utils/app_funcs.py#L349" target="_blank"><code>plot_heatmap_ratios_hosp()</code></a>
+										<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/3eb9e7863707c11855e5eacbfcacf87290ddde02/utils/app_funcs.py#L383" target="_blank"><code>plot_heatmap_ratios_icu()</code></a>
+										<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/3eb9e7863707c11855e5eacbfcacf87290ddde02/utils/app_funcs.py#L417" target="_blank"><code>plot_heatmap_ratios_deaths()</code></a>
+										with the resulting figures looking like this:
+										<div class="image main"><img src="images/covid_dash_ratio_hosp_fig.jpg" alt="" /></div>
+									</p>
+								<h2>Writing the Streamlit app</h2>
+									<p>
+										To deploy the app into a user-friendly dashboard we've chosen Streamlit to develop it as a web application. The execution logic is centered around a navigation panel that the user can use to switch sections so that every time the user changes sections the app compiles all of the above assets.
+									</p>
+									<p>To implement it, we've written an 
+										<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/f24449e746b82ef2bad038e50cc6034d265eeb8d/app.py#L1" target="_blank"><code>app.py</code></a>
+										script simulating a stateful system where the state variable <code>rad</code> is defined as follows:
+									<pre>
+										<code>rad = st.sidebar.radio(
+	label = "Navigation",
+	options = [
+		"Overview",
+		"Cases",
+		"Hospitalizations",
+		"ICU Admissions",
+		"Deaths",
+		]
+)
+									</code>
+									</pre>
+									And the code for the <code>Cases</code> state is the following:
+									<pre>
+										<code>
+if rad == "Cases":
 
+    # 1. Lineplot Figure
+    st.write("""
+    ## Daily Cases By Age
+    """)
+    # process the data to plot
+    age_series = get_sma7_gby_age_date(data)
+    fig = plot_lineplot(age_series, 'dailyCases')
+    # send to streamlit
+    st.plotly_chart(fig, use_container_width=True)
+    
+    # 2. Wave Totals Figure
+    st.write("""
+    ## Within-Wave Distribution by Age and Total Cases
+    """)
+    # get data for wave heatmap
+    heatmap = get_wave_heatmap_data(data, variable='cases')
+    # get data for barplot
+    wave_totals = data.groupby('wave', as_index=False).sum()
+    # plot wave figure: wave/age heatmap + wave totals barplot
+    fig = plot_wave_heatmap(
+        heatmap_data=heatmap, 
+        barplot_data=wave_totals, 
+        variable='cases')
+    # save to image and plot
+    buf = BytesIO()
+    fig.savefig(buf, format="png")
+    st.image(buf)
+
+    # 3. Age totals Figure
+    st.write("""
+    ## Within-Age Distribution by Wave and Total Cases
+    """)
+    # get data for heatmap
+    heatmap = get_age_heatmap_data(data, variable='cases')
+    # get data for barplot
+    age_totals = data.groupby('age').sum().drop('NC').reset_index()
+    # plot population figure: age/wave heatmap + age totals barplot
+    fig = plot_heatmap_age(
+        heatmap_data=heatmap, 
+        barplot_data=age_totals, 
+        variable='cases')
+    # save to image and plot
+    buf = BytesIO()
+    fig.savefig(buf, format="png")
+    st.image(buf)
+
+    # 4. Heatmap of cases and total pop
+    st.write("""
+    ## Total Cases as % of Total Age Group Population and Total Age Group Population
+    """)
+    # get heatmap data
+    heatmap = get_age_totalpop_norm_heatmap_data(data, pop, 'cases')
+    # get barplot data
+    pop_totals = pop.groupby('age').population.sum().drop('total').reset_index()
+    fig = plot_heatmap_pop(heatmap, pop_totals)
+    buf = BytesIO()
+    fig.savefig(buf, format="png")
+    st.image(buf)
+										</code>
+									</pre>	
+									Which is simply a sequential execution of the previously described sections. The remaining sections 
+									<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/f24449e746b82ef2bad038e50cc6034d265eeb8d/app.py#L144" target="_blank"><code>Hospitalizations</code></a>
+									<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/f24449e746b82ef2bad038e50cc6034d265eeb8d/app.py#L207" target="_blank"><code>ICU Admissions</code></a>
+									and
+									<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/f24449e746b82ef2bad038e50cc6034d265eeb8d/app.py#L270" target="_blank"><code>Deaths</code></a>
+									follow the same structure, with the only difference being the observed variable passed to the data and plot functions.
+								</p>
+								<p>The command to execute the app is <code>streamlit run app.py</code></p>
+								<h2>Deployment</h2>
+									<p></p>
+								</section>
 					</div>
 
 
