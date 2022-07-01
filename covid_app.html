@@ -69,36 +69,38 @@ from scipy.signal import find_peaks
 
 
 def get_data():
-"""gathers data from the Spanish Ministry of Health and formats it 
-Returns:
-	data(pd.DataFrame): gathered dataframe with some basic formatting
-"""
-url = 'https://cnecovid.isciii.es/covid19/resources/casos_hosp_uci_def_sexo_edad_provres.csv'
-data = pd.read_csv(url).convert_dtypes()
-data.fecha = pd.to_datetime(data.fecha)
-# renames
-col_rename = {
-	'provincia_iso': 'province',
-	'sexo':'sex',
-	'grupo_edad':'age',
-	'fecha':'date',
-	'num_casos':'cases',
-	'num_hosp':'hospitalizations',
-	'num_uci':'icu',
-	'num_def':'deaths',
-}
-data = data.rename(col_rename, axis = 'columns')
-# remap ages
-dict_remap = dict(zip(
-	data.age.unique(), 
-	['0s', '10s', '20s', '30s', '40s', '50s', '60s', '70s', '80+', 'NC']))
-data.age = data.age.replace(dict_remap)
-# find first case
-min_date = data.groupby('date', as_index=False).sum().query("cases > 0").date.min()
-# keep only values gte min_date
-date_mask = data.date >= min_date
-data = data.loc[date_mask, :]
-return data</code></pre>
+	"""gathers data from the Spanish Ministry of Health and formats it 
+	Returns:
+		data(pd.DataFrame): gathered dataframe with some basic formatting
+	"""
+	url = 'https://cnecovid.isciii.es/covid19/resources/casos_hosp_uci_def_sexo_edad_provres.csv'
+	data = pd.read_csv(url).convert_dtypes()
+	data.fecha = pd.to_datetime(data.fecha)
+	# renames
+	col_rename = {
+		'provincia_iso': 'province',
+		'sexo':'sex',
+		'grupo_edad':'age',
+		'fecha':'date',
+		'num_casos':'cases',
+		'num_hosp':'hospitalizations',
+		'num_uci':'icu',
+		'num_def':'deaths',
+	}
+	data = data.rename(col_rename, axis = 'columns')
+	# remap ages
+	dict_remap = dict(zip(
+		data.age.unique(), 
+		['0s', '10s', '20s', '30s', '40s', '50s', '60s', '70s', '80+', 'NC']))
+	data.age = data.age.replace(dict_remap)
+	# find first case
+	min_date = data.groupby('date', as_index=False).sum().query("cases > 0").date.min()
+	# keep only values gte min_date
+	date_mask = data.date >= min_date
+	data = data.loc[date_mask, :]
+	return data
+
+</code></pre>
 									that reads the .csv file and does some basic formatting. The resulting table has 1.423.049 rows and 8 columns: province, sex, age, date, cases, hospitalizations, icu and deaths. The following table shows the observation with the highest hospitalizations value for each age group:</p>
 									<pre>
 										<table border="1" class="dataframe">
@@ -336,7 +338,13 @@ return data</code></pre>
 									for aggregated daily values and 
 										<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/f92099e69dd12ec33e1e1168142a9f55703f3c50/utils/app_funcs.py#L54" target = "_blank"><code>get_sma_gby_age_date()</code></a> 
 									for aggregated daily values by age group.</p> 
-									<pre><code class="python">def get_sma7_gby_date(data):
+									<pre><code class="python">
+def get_sma7_gby_date(data):
+	"""Takes the covid dataset and returns the daily 7-day moving average
+
+	Returns:
+		pd.DataFrame: data grouped by date
+	"""
 	by_date = data.groupby('date').agg(
 		dailyCases = ('cases', sum),
 		dailyHospitalizations = ('hospitalizations', sum),
@@ -345,8 +353,17 @@ return data</code></pre>
 	).sort_values('date').rolling(7).mean().fillna(0).astype(int).reset_index()
 	return by_date
 
-# Added to class DataHandler
+
 def get_sma7_gby_age_date(data):
+	"""groups by age and date and calculates the daile 7day-sma for each age group
+
+	Args:
+		data (pd.DataFrame): covid dataset returned by get_data()
+
+	Returns:
+		pd.DataFrame: sma7 by age and date of observed variables
+	"""
+	# get daily data by age group
 	by_age = data.groupby(['age', 'date']).agg(
 		dailyCases = ('cases', sum),
 		dailyHospitalizations = ('hospitalizations', sum),
@@ -356,10 +373,13 @@ def get_sma7_gby_age_date(data):
 	# smooth to sma7
 	by_age = by_age.set_index('date').groupby('age').rolling(7).mean()
 	by_age = by_age.fillna(0).astype(int).reset_index()
+	# also generate an 'all ages' age group for future plotting
 	all_ages = by_age.groupby('date', as_index=False).sum()
 	all_ages['age'] = 'All Ages'
 	data_out = pd.concat([by_age, all_ages])
-	return data_out</code></pre>
+	return data_out
+
+</code></pre>
 									<div class="image main"><img src="images/covid_dash_daily_vs_sma.jpg" alt="" /></div>
 								<h4>Wave Variable</h4>	
 									<p>Because we're also interested in evaluating total values between waves, we've written the function 
@@ -367,24 +387,42 @@ def get_sma7_gby_age_date(data):
 										which takes advantage of the scipy function 
 										<a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.find_peaks.html">find_peaks()</a> 
 										to determine wave peaks, and then defines wave frontiers as the minimum between peaks.</p>
-									<pre><code class="python">def get_waves(get_sma7_gby_date, data):
+									<pre><code class="python">
+def get_waves(get_sma7_gby_date, data):
+	"""_summary_
+
+	Args:
+		get_sma7_gby_date (python function): gets the daily sma7 of observed variabels
+		data (pd.DataFrame): covid dataset returned by get_data()
+
+	Returns:
+		pd.DataFrame: dataframe with the added "waves" column
+	"""
+	# get daily totals
 	daily_totals = get_sma7_gby_date(data)
 	# get peak indices
 	peaks, _ = find_peaks(
 		x = daily_totals.dailyCases,
 		width=20
 		)
+	# get peak dates
 	peak_dates = daily_totals.iloc[peaks].date
 	peaks_array = peak_dates.values
+	# find valleys as minimum between peaks
 	valleys = []
 	for i in range(1,peaks_array.size):
+		# subset dataset between peaks
 		lower_bound = peaks_array[i-1]
 		upper_bound = peaks_array[i]
 		mask = daily_totals.date.between(lower_bound, upper_bound)
+		# get index of the minumum
 		valleys.append(daily_totals[mask].dailyCases.idxmin())
+	# get dates from the indices list
 	valley_dates = daily_totals.iloc[valleys].date.values
+	# inserts required for pd.cut
 	wave_dates = np.insert(valley_dates, 0, data.date.min())
 	wave_dates = np.insert(wave_dates, wave_dates.size, data.date.max())
+	# create the numerical variable wave 
 	data['wave'] = pd.cut(
 		data.date, 
 		bins=wave_dates,
@@ -392,7 +430,7 @@ def get_sma7_gby_age_date(data):
 		include_lowest = True,
 		labels = range(1, wave_dates.size)
 		)
-	return data, peak_dates, valley_dates
+	return data
 
 									</code></pre>
 									<div class="image main"><img src="images/covid_dash_waves_plot.jpg" alt="" /></div>
