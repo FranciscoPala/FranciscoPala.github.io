@@ -1232,64 +1232,64 @@ data = map_province(data, prov)
 								<code class="python">
 if rad == "Cases":
 
-# 1. Lineplot Figure
-st.write("""
-## Daily Cases By Age
-""")
-# process the data to plot
-age_series = get_sma7_gby_age_date(data)
-fig = plot_lineplot(age_series, 'dailyCases')
-# send to streamlit
-st.plotly_chart(fig, use_container_width=True)
+	# 1. Lineplot Figure
+	st.write("""
+	## Daily Cases By Age
+	""")
+	# process the data to plot
+	age_series = get_sma7_gby_age_date(data)
+	fig = plot_lineplot(age_series, 'dailyCases')
+	# send to streamlit
+	st.plotly_chart(fig, use_container_width=True)
 
-# 2. Wave Totals Figure
-st.write("""
-## Within-Wave Distribution by Age and Total Cases
-""")
-# get data for wave heatmap
-heatmap = get_wave_heatmap_data(data, variable='cases')
-# get data for barplot
-wave_totals = data.groupby('wave', as_index=False).sum()
-# plot wave figure: wave/age heatmap + wave totals barplot
-fig = plot_wave_heatmap(
-heatmap_data=heatmap, 
-barplot_data=wave_totals, 
-variable='cases')
-# save to image and plot
-buf = BytesIO()
-fig.savefig(buf, format="png")
-st.image(buf)
+	# 2. Wave Totals Figure
+	st.write("""
+	## Within-Wave Distribution by Age and Total Cases
+	""")
+	# get data for wave heatmap
+	heatmap = get_wave_heatmap_data(data, variable='cases')
+	# get data for barplot
+	wave_totals = data.groupby('wave', as_index=False).sum()
+	# plot wave figure: wave/age heatmap + wave totals barplot
+	fig = plot_wave_heatmap(
+	heatmap_data=heatmap, 
+	barplot_data=wave_totals, 
+	variable='cases')
+	# save to image and plot
+	buf = BytesIO()
+	fig.savefig(buf, format="png")
+	st.image(buf)
 
-# 3. Age totals Figure
-st.write("""
-## Within-Age Distribution by Wave and Total Cases
-""")
-# get data for heatmap
-heatmap = get_age_heatmap_data(data, variable='cases')
-# get data for barplot
-age_totals = data.groupby('age').sum().drop('NC').reset_index()
-# plot population figure: age/wave heatmap + age totals barplot
-fig = plot_heatmap_age(
-heatmap_data=heatmap, 
-barplot_data=age_totals, 
-variable='cases')
-# save to image and plot
-buf = BytesIO()
-fig.savefig(buf, format="png")
-st.image(buf)
+	# 3. Age totals Figure
+	st.write("""
+	## Within-Age Distribution by Wave and Total Cases
+	""")
+	# get data for heatmap
+	heatmap = get_age_heatmap_data(data, variable='cases')
+	# get data for barplot
+	age_totals = data.groupby('age').sum().drop('NC').reset_index()
+	# plot population figure: age/wave heatmap + age totals barplot
+	fig = plot_heatmap_age(
+	heatmap_data=heatmap, 
+	barplot_data=age_totals, 
+	variable='cases')
+	# save to image and plot
+	buf = BytesIO()
+	fig.savefig(buf, format="png")
+	st.image(buf)
 
-# 4. Heatmap of cases and total pop
-st.write("""
-## Total Cases as % of Total Age Group Population and Total Age Group Population
-""")
-# get heatmap data
-heatmap = get_age_totalpop_norm_heatmap_data(data, pop, 'cases')
-# get barplot data
-pop_totals = pop.groupby('age').population.sum().drop('total').reset_index()
-fig = plot_heatmap_pop(heatmap, pop_totals)
-buf = BytesIO()
-fig.savefig(buf, format="png")
-st.image(buf)
+	# 4. Heatmap of cases and total pop
+	st.write("""
+	## Total Cases as % of Total Age Group Population and Total Age Group Population
+	""")
+	# get heatmap data
+	heatmap = get_age_totalpop_norm_heatmap_data(data, pop, 'cases')
+	# get barplot data
+	pop_totals = pop.groupby('age').population.sum().drop('total').reset_index()
+	fig = plot_heatmap_pop(heatmap, pop_totals)
+	buf = BytesIO()
+	fig.savefig(buf, format="png")
+	st.image(buf)
 								</code>
 							</pre>	
 							Which is simply a sequential execution of the previously described steps. The remaining sections 
@@ -1343,10 +1343,10 @@ CMD ["app.py"]
 						<!--7. Future Improvements Section-->
 						<section>
 						<h2>Future Improvements</h2>
-							<p>After developing the app, there are a few improvements worth mentioning (which will tackled in a different project)</p>
+							<p>After developing the app, there are a few improvements worth mentioning (which we'll tackle in a different project)</p>
 							<ul>
-								<li>The app uses up all of the EC2 instance CPU, the reason behind this is that the assets are generated on the fly as opposed to generated once every time the data changes.</li>
-								<li>There are a lot of patterns between sections, meaning we can encapsulate all of the functions inside a class VariableSection which encapsulates all the functions that generate the data and figures, notably reducing the code in the app.py. Also, if we wanted to create new sections (such as a section with filters) that new section could inherit from the aforementioned class.</li>
+								<li>The app uses up all of the EC2 instance CPU, the reason behind this is that the assets are generated on the fly as opposed to generated once every time the data changes. In the future we'd like to test a self updating app which computes everything once and saves all figures and intermediate datasets to the app cache.</li>
+								<li>There are a lot of patterns between sections, meaning we can define a class which includes all the functions that generate the data and figures, notably reducing the code in the app.py. Also, if we wanted to create new sections (such as a section with filters) that new section could inherit from the aforementioned class.</li>
 							</ul>
 						</section>
 					</section>
