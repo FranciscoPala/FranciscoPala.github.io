@@ -68,7 +68,7 @@
 							<p>Both datasets are available in the "Overview" section of the app.</p>
 							<!--Covid Data-->
 							<h3>Dataset with daily data</h3>
-								<p>The first thing we need is a dataset with our daily variables. Luckily for us, the Spanish Ministry of Health publishes this data sort of regularly <a href="https://cnecovid.isciii.es/covid19/resources/casos_hosp_uci_def_sexo_edad_provres.csv" target ="_blank">here</a>. We've written a function <a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/f92099e69dd12ec33e1e1168142a9f55703f3c50/utils/app_funcs.py#L10" target ="_blank"><code>get_data()</code></a></p>
+								<p>The first thing we need is a dataset with our daily variables. Luckily for us, the Spanish Ministry of Health publishes this data sort of regularly <a href="https://cnecovid.isciii.es/covid19/resources/casos_hosp_uci_def_sexo_edad_provres.csv" target ="_blank">here</a>. We've written a function <a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/7b005001fceba8d079ed5006256b8468df10eaed/utils/app_funcs.py#L12" target ="_blank"><code>get_data()</code></a></p>
 								<!--CODE: get_data()-->
 								<pre>
 									<code class="python">										
@@ -632,9 +632,9 @@ def map_province(covid_data, prov_data):
 							<!--Description of SMA7 tasks-->
 							<h3>Smoothing</h3>
 								<p>Visualizations related to differences in the data between provinces and sex have been left out for future development. In our case, we're interested in evolution of total daily values and differences between and within age groups. We've smoothed the observed variables to their 7-day simple moving average returned by the function 
-									<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/f92099e69dd12ec33e1e1168142a9f55703f3c50/utils/app_funcs.py#L44" target="_blank"><code>get_sma_gby_date()</code></a> 
+									<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/7b005001fceba8d079ed5006256b8468df10eaed/utils/app_funcs.py#L63" target="_blank"><code>get_sma_gby_date()</code></a> 
 								for aggregated daily values and 
-									<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/f92099e69dd12ec33e1e1168142a9f55703f3c50/utils/app_funcs.py#L54" target = "_blank"><code>get_sma_gby_age_date()</code></a> 
+									<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/7b005001fceba8d079ed5006256b8468df10eaed/utils/app_funcs.py#L81" target = "_blank"><code>get_sma_gby_age_date()</code></a> 
 								for aggregated daily values by age group.</p> 
 								<!--CODE: sm7 groupbys-->
 								<pre>
@@ -685,7 +685,7 @@ def get_sma7_gby_age_date(data):
 							<!--Description of Wave inference task-->
 							<h3>Wave Variable</h3>	
 								<p>Because we're also interested in evaluating total values between waves, we've written the function 
-									<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/f92099e69dd12ec33e1e1168142a9f55703f3c50/utils/app_funcs.py#L70" target="_blank"><code>get_waves()</code></a> 
+									<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/7b005001fceba8d079ed5006256b8468df10eaed/utils/app_funcs.py#L107" target="_blank"><code>get_waves()</code></a> 
 									which takes advantage of the scipy function 
 									<a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.find_peaks.html">find_peaks()</a> 
 									to determine wave peaks, and then defines wave frontiers as the minimum between peaks.</p>
@@ -756,9 +756,9 @@ def get_waves(get_sma7_gby_date, data):
 							<h3>1. Interactive Line plot</h3>
 								<section>
 								<p>We've used the Python library Plotly to generate an interactive graph. The data used is the ouput of the previously described function 
-										<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/f92099e69dd12ec33e1e1168142a9f55703f3c50/utils/app_funcs.py#L54" target = "_blank"><code>get_sma_gby_age_date()</code></a> 
+										<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/7b005001fceba8d079ed5006256b8468df10eaed/utils/app_funcs.py#L81" target = "_blank"><code>get_sma_gby_age_date()</code></a> 
 									and the function to plot the figure is 
-										<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/f92099e69dd12ec33e1e1168142a9f55703f3c50/utils/app_funcs.py#L203" target = "_blank"><code>plot_lineplot()</code></a>. 
+										<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/7b005001fceba8d079ed5006256b8468df10eaed/utils/app_funcs.py#L301" target = "_blank"><code>plot_lineplot()</code></a>. 
 									In the app, the user can click on the age groups in the legend to toogle them on and off.</p>
 								<!--CODE: plot_lineplot() -->
 								<pre>
@@ -796,11 +796,11 @@ def plot_lineplot(data, variable):
 							<h3>2. Wave totals figure</h3>
 								<section>
 								<p>We've used the Python library Seaborn to create a figure consisting of two axes. The first is the above mentioned heatmap representing combinations of wave/age group normalized to the wave totals. The latter represents those wave totals for reference. The data for the heatmap is the ouput of the function 
-									<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/3eb9e7863707c11855e5eacbfcacf87290ddde02/utils/app_funcs.py#L103" target="_blank"><code>get_wave_heatmap_data()</code></a>
+									<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/7b005001fceba8d079ed5006256b8468df10eaed/utils/app_funcs.py#L152" target="_blank"><code>get_wave_heatmap_data()</code></a>
 								and the data for the bar plot is the total value for each wave, which does not require a function because it can be obtained with one line of code 
 									<code>data.groupby('wave', as_index=False).sum()</code>. 
 								The function that plots the figure is
-									<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/3eb9e7863707c11855e5eacbfcacf87290ddde02/utils/app_funcs.py#L191" target="_blank"><code>plot_wave_heatmap()</code></a>
+									<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/7b005001fceba8d079ed5006256b8468df10eaed/utils/app_funcs.py#L327" target="_blank"><code>plot_wave_heatmap()</code></a>
 								<pre>
 									<code class="python">
 def get_wave_heatmap_data(data, variable):
@@ -898,11 +898,11 @@ def plot_wave_heatmap(heatmap_data, barplot_data, variable):
 							<h3>3. Age group totals figure</h3>
 								<section>
 								<p>This figure is similar to the above except instead of normalizing to wave totals, we've normalized to age group totals. The function to get the data is:
-									<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/3eb9e7863707c11855e5eacbfcacf87290ddde02/utils/app_funcs.py#L120" target="_blank"><code>get_age_heatmap_data()</code></a>
+									<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/7b005001fceba8d079ed5006256b8468df10eaed/utils/app_funcs.py#L183" target="_blank"><code>get_age_heatmap_data()</code></a>
 								age group totals are obtained with:
 									<code>data.groupby('age', as_index=False).sum()</code>. 
 								The function that plots the figure is:
-									<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/3eb9e7863707c11855e5eacbfcacf87290ddde02/utils/app_funcs.py#L251" target="_blank"><code>plot_heatmap_age()</code></a></p>
+									<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/7b005001fceba8d079ed5006256b8468df10eaed/utils/app_funcs.py#L384" target="_blank"><code>plot_heatmap_age()</code></a></p>
 									<pre>
 										<code>
 def get_age_heatmap_data(data, variable):
@@ -1000,10 +1000,10 @@ def plot_heatmap_age(heatmap_data, barplot_data, variable):
 							<section>
 								<h4>Cases section</h4>
 									<p>This figure varies depending on the section of the app we are at. In the cases section, the figure consists of a heatmap with the total cases normalized to the Spanish population for that age group, and a bar plot displaying the total population. The data for the heatmap is generated by the function:
-										<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/3eb9e7863707c11855e5eacbfcacf87290ddde02/utils/app_funcs.py#L172" target="_blank"><code>get_age_totalpop_norm_heatmap_data()</code></a>population totals are obtained with the line of code:
+										<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/7b005001fceba8d079ed5006256b8468df10eaed/utils/app_funcs.py#L263" target="_blank"><code>get_age_totalpop_norm_heatmap_data()</code></a>population totals are obtained with the line of code:
 										<code>pop.groupby('age').population.sum().drop('total').reset_index()</code>.
 									The function that plots the figure is:
-										<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/3eb9e7863707c11855e5eacbfcacf87290ddde02/utils/app_funcs.py#L298" target="_blank"><code>plot_heatmap_pop()</code></a></p>
+										<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/7b005001fceba8d079ed5006256b8468df10eaed/utils/app_funcs.py#L441" target="_blank"><code>plot_heatmap_pop()</code></a></p>
 										<pre>
 											<code class="python">
 def get_age_totalpop_norm_heatmap_data(data, data_pop, variable):
@@ -1101,13 +1101,13 @@ def plot_heatmap_pop(heatmap_data, pop_data):
 										<div class="image main"><img src="images/covid_app/covid_dash_ratio_cases_fig.jpg" alt="" /></div>
 								<h4>hospitalizations, ICU admissions and deaths section</h4>
 									<p>As noted before, these sections differ from the cases section in that, aside from the heatmap of the observed variable totals normalized to the Spanish population, there is a heatmap representing the ratio of the observed variable and the previous most restrictive variable (cases for hospitalizations, hospitalizations for ICU admissions and ICU admissions for deaths). The data for each section is obtained with the functions:
-										<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/3eb9e7863707c11855e5eacbfcacf87290ddde02/utils/app_funcs.py#L136" target="_blank"><code>get_hosp_ratio_data()</code></a>
-										<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/3eb9e7863707c11855e5eacbfcacf87290ddde02/utils/app_funcs.py#L148" target="_blank"><code>get_icu_ratio_data()</code></a>
-										<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/3eb9e7863707c11855e5eacbfcacf87290ddde02/utils/app_funcs.py#L160" target="_blank"><code>get_deaths_ratio_data()</code></a>
+										<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/7b005001fceba8d079ed5006256b8468df10eaed/utils/app_funcs.py#L214" target="_blank"><code>get_hosp_ratio_data()</code></a>
+										<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/7b005001fceba8d079ed5006256b8468df10eaed/utils/app_funcs.py#L239" target="_blank"><code>get_icu_ratio_data()</code></a>
+										<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/7b005001fceba8d079ed5006256b8468df10eaed/utils/app_funcs.py#L251" target="_blank"><code>get_deaths_ratio_data()</code></a>
 										And the figures plotted with:
-										<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/3eb9e7863707c11855e5eacbfcacf87290ddde02/utils/app_funcs.py#L349" target="_blank"><code>plot_heatmap_ratios_hosp()</code></a>
-										<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/3eb9e7863707c11855e5eacbfcacf87290ddde02/utils/app_funcs.py#L383" target="_blank"><code>plot_heatmap_ratios_icu()</code></a>
-										<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/3eb9e7863707c11855e5eacbfcacf87290ddde02/utils/app_funcs.py#L417" target="_blank"><code>plot_heatmap_ratios_deaths()</code></a></p>
+										<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/7b005001fceba8d079ed5006256b8468df10eaed/utils/app_funcs.py#L499" target="_blank"><code>plot_heatmap_ratios_hosp()</code></a>
+										<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/7b005001fceba8d079ed5006256b8468df10eaed/utils/app_funcs.py#L541" target="_blank"><code>plot_heatmap_ratios_icu()</code></a>
+										<a href="https://github.com/FranciscoPala/COVID-19_Spain_dashboard/blob/7b005001fceba8d079ed5006256b8468df10eaed/utils/app_funcs.py#L575" target="_blank"><code>plot_heatmap_ratios_deaths()</code></a></p>
 									<pre>
 										<code class="python">
 def get_hosp_ratio_data(data, pop):
