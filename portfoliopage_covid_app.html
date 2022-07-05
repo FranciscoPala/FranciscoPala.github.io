@@ -1347,6 +1347,8 @@ CMD ["app.py"]
 							<ul>
 								<li>The app uses up all of the EC2 instance CPU, the reason behind this is that the assets are generated on the fly as opposed to generated once every time the data changes. In the future we'd like to test a self updating app which computes everything once and saves all figures and intermediate datasets to the app cache.</li>
 								<li>There are a lot of patterns between sections, meaning we can define a class which includes all the functions that generate the data and figures, notably reducing the code in the app.py. Also, if we wanted to create new sections (such as a section with filters) that new section could inherit from the aforementioned class.</li>
+								<li>Add global filters for province/sex/autonomous community</li>
+								<li>Add ARIMA/prophet predictions</li>
 							</ul>
 						</section>
 					</section>
